@@ -1,0 +1,409 @@
+vue中用watch来监视data数据的变化，当被监视的数据发生变化watch中定义的相关方法便会被调用。
+插件
+   Swiper  有文档有实例
+   Mint UI 基于 Vue.js 的移动端组件库
+        npm install mint-ui -save
+        import "../../../../node_modules/mint-ui/lib/style.css"
+        在引入想要的import { MessageBox } from 'mint-ui';
+        在跟文档来 文档的
+             MessageBox.confirm('确定清空购物车吗?').then(action => {
+                this.$store.dispatch("deleteFoodCart")
+              }).catch(()=>{})
+
+   模拟(Mock.js)数据/接口
+         生成随机数据，拦截 Ajax 请求 npm install mockjs  网址http://mockjs.com/
+          import Mock from 'mockjs'
+          import data from './data.json'//json数据
+          // 返回goods的接口
+          Mock.mock('/goods', {code:0, data: data.goods})
+          export default ???  不需要向外暴露任何数据, 只需要保存能执行即可
+          main.js里 import './mock/mockServer'引入
+   vue-lazyload懒加载
+       npm install vue-lazyload@1.2.3 --save
+       main文件里
+          import VueLazyload from 'vue-lazyload'
+          import loading from './common/loading.gif'
+          Vue.use( VueLazyload, {
+            preLoad: 1.3,//预加载高度的比例
+            error:loading,//	图片加载失败后
+            loading: loading,//图像正在加载时
+            attempt: 3//尝试次数
+            只设置loading也得
+             loading,
+          })
+    data-fns/moment日期封装
+        import Vue from 'vue'
+        // import moment from 'moment'
+        import format from 'date-fns/format'
+        // 自定义过滤器
+        Vue.filter('date-format', function (value, formatStr='YYYY-MM-DD HH:mm:ss') {
+          // return moment(value).format(formatStr)
+          return format(value, formatStr)
+        })
+        
+
+   formidable   --->post请求
+
+
+router
+  1安装vue vue-router --save
+    import Vue from 'vue'
+    import Router from 'vue-router'
+  2
+    Vue.use(Router)
+  3
+    const router = new Router({
+      routes:[
+          {path:'',redirect:''},
+          {path:'',component:xxx,meta:{}},
+        ]
+      })
+         {
+  4
+    main文件注册router,
+
+Vuex
+  1 安装 >npm install vuex@3.X
+  2
+    import Vue from 'vue'
+    import Vuex from 'vuex'
+  3
+    Vue.use(Vuex)
+  4
+      import actions from './actions.js'……
+       const store = new Vuex.Store({
+         state,
+         getters,
+         mutations,
+         actions
+       })
+       export default store
+ 5
+     state.js
+           export default {address：{} ,FoodType：[]}
+     getters.js
+           export  default { }
+     actions.js
+        //axios import {repAddress,repFoodType,repShops} from '../api/index'
+          export default {
+            //异步获取地址
+            async getAddress(context/{commit}) {
+              //发送异步请求
+              const result = await repAddress()
+              //提交一个mutation
+              if (result.code === 0) {
+                const address = result.data
+                context.commit/commit("receive_address" , address)
+              }
+            },
+           }
+     mutations.js
+          export default {
+            receive_address(state, address) {  //receive_address:function(){}
+              state.address = address
+
+            }
+ 6   触发Actions
+      1.1 第二种导入 import {mapActions} from 'vuex'
+         mounted() {
+          //第一种   this.$store.dispatch('getFoodType')
+          1.3 this.getAddress()
+        },
+      1.2
+       methods:{
+         ...mapActions(["getAddress"])
+       },
+7
+   读取State存储的数据
+     1.1
+       import {mapState/mapGetters} from  'vuex'//取State数据
+     1.2
+           computed:{
+             ...mapState(['address',"FoodType"])
+
+           }
+
+     1.3
+           <header-top :title="address.login" :title1=" address.title"></header-top>
+
+
+
+axios-promise封装
+ export  const reqloginMassge=(data)=>Axios("http://127.0.0.1/reqloginMassge",data,"post")//接受对象，但是data本身是对象就不用加{data}了
+ 1 安装axios npm install axios --save
+       promise npm install promise --save
+   import axios from 'axios'
+   //放回promise data数据的对象
+
+   export default function Axios(url, data = {}, type = 'GET') {
+     return new promise((resolve, reject) => {
+       let promise
+       if (type === 'GET') {
+         let dataStr = ''
+         Object.keys(data).forEach(key => {
+           dataStr += key + "=" + data[key] + "&"  //name="alex"&age=12&nmae="aekx
+         })
+         if (dataStr !== "") {
+           dataStr = dataStr.substr(0, dataStr.length - 1)
+           url = url + "?" + dataStr
+         }
+         promise = axios.get(url)
+       } else {
+         promise = axios.post(url, data)
+       }
+
+       promise.then(response => {
+         resolve(response.data)   //成功放回data数据 在.then就得data数据了
+       }).catch(error => {
+         reject(response.data)
+       })
+     })
+  }
+
+
+取值 内部 用 :  外部 {{}} data与放值用法
+     <img :src="baseImgUrl+item.img">
+     <div>{{}}</div>
+
+
+    data(){  //函数
+      return{
+         xxx:{}
+      }
+    }
+    conputer:{}//对象
+
+@click/v-if/v-else用法  methods与conputer
+         计算属性和methods的执行结果都是相同的   计算属性依赖数据改变数据
+         methods方法，每调用一次，就会触发一次
+         conputer会缓存
+
+         <p @click=get> <--or {{get}}</p>
+           <input type="text" maxlength="8"  placeholder="密码" class="miam" v-if="showPwd"/>//显示隐藏，只能有一个
+           <input type="password" maxlength="8"  placeholder="密码" class="miam" v-else />
+          <div class="on_off" @click="showPwd=!showPwd">
+
+          <p>{{get1}}</p>
+          data:{
+            return(){
+              showPwd:false
+            }
+          }
+         methods:{
+           get(){
+            return 222
+           }
+         }
+
+         conputer:{
+            get1(){
+           return 111
+             }
+         }
+ class与computed与props用法this 可以都可以点出   :class/@click ---控制data/props/computed/methods
+        <i class="fa fa-star " :class="{on: this.score>10} " aria-hidden="true" ></i>//变量
+         <i class="fa fa-star " :class="{'on': this.sc>2,'on1':1==1}" aria-hidden="true" ></i>
+           <div class="on_off" @click="showPwd=!showPwd" :class="showPwd ? 'onin' : 'offin'">字符串.onin/offin{}
+          props:{
+            score:String,
+
+          },
+           data(){
+             return{
+              showPwd:false
+             }
+           }
+          computed:{
+             sc(){
+               let sc1=this.score
+               return sc1
+             }
+          }
+v-for用法
+     <div class="swiper-slide" v-for="(item,index) in FoodType " :key="index">
+          <div class=" center display"  v-for="(item1,index) in item" :key="index">
+            <a href="">
+              <img :src="item1[0].midImg">
+
+
+$route.path用法不用页面跳转切换
+    <div class="center " :class="{red:'/takeOutFood'===$route.path}" @click="goTo('/takeOutFood')" >
+        methods:{
+          goTo(path){
+            this.$router.replace(path)
+          }
+        },
+
+不跳转页面切换
+         <div :class="{onsort:!loginWay} " @click="loginWay=false">密码登录</div>
+        <div :class="{onsort:loginWay}" @click="loginWay=true">短信登录</div>
+         data(){
+            return{
+              loginWay:true
+            }
+          }
+
+v-model用法
+        <input type="text" placeholder="手机号" v-model="phone"/>//输入值
+                  <div class="Code gray" :class="{gray1:gray}" >
+
+        data(){
+            return{
+              phone:'' //可以也得到值必须设置会报错
+            }
+          },
+          computed:{
+            gray(){
+              return /^1\d{10}$/.test(this.phone)   返回Boolean
+            }
+          }
+
+v-bind用发
+                                            false/true 不得:disabled="{disabled:!gray}" 只得class
+          <button class="Code gray" :disabled="!gray" :class="{gray1:gray}" @click.prevent="getCode">
+
+          <div>{{computeTime>0 ?`已发送(${computeTime})s`: "获取验证码"}}</div>
+
+          data(){
+            return{
+              computeTime:0
+            }
+          },
+              methods:{
+                getCode(){
+                  let time=null
+                  if(this.computeTime===0 ){//计时加快解决
+                    this.computeTime=30
+                    time= setInterval(()=>{
+                      this.computeTime--
+                      if(this.computeTime<=0){
+                        clearInterval(time)
+                      }
+                    },1000)
+                  }
+
+                }
+              }
+
+v-show/computed
+<p v-show="showCart"> </p>//第一次/和相关数据变化执行
+        computed:{
+          showCart(){
+              if(!this.totalCount){
+                this.ifshowCart=false
+              }
+                 return this.ifshowCart
+            }
+        }
+
+
+
+
+import state from "../../store/state";
+  console.log(state)//查state
+
+computed/数量封装
+    <div>
+      <i class="fa fa-star " aria-hidden="true"
+         v-for="(item,index) in starList" :key="index" :class="item"></i>
+    </div>
+    <script>
+    const  add_on="on"
+    const  add_off="off"
+    export default {
+      name: "Star",
+      props:{
+        score:String,
+        number:Number,
+      },
+
+      computed:{
+        starList(){
+          let scc=[]
+          let add_num=Math.floor(this.score)
+          for(let i=0;i<(add_num/2);i++){
+              scc.push(add_on)
+          }
+          let lentghscc=scc.length
+          for(let j=lentghscc; j<5;j++){
+            scc.push(add_off)
+          }
+           return scc
+         }
+      }
+
+    }
+    </script>
+
+ better-scroll封装
+             <template>
+               <div class="wrapperScroll" ref="wrapper">
+                 <div class="contentScroll">
+                   <slot></slot>
+                 </div>
+               </div>
+             </template>
+
+             <script>
+             import BScroll from "better-scroll"
+
+             export default {
+               name: "Scroll",
+               props: {
+                 probetype: {
+                   type: Number,
+                   default: 0
+                 },
+                 pullup: {
+                   type: Boolean,
+                   default: false
+                 }
+               },
+               data() {
+                 return {
+                   scroll: null
+                 }
+               },
+               mounted() {
+                 setTimeout(() => {
+                   this.$nextTick(() => {
+                     if (!this.$refs.wrapper) {
+                       return
+                     }
+                     this.scroll = new BScroll(this.$refs.wrapper, {
+                       click: true,   //配置点击
+                       probeType: this.probetype, //配置滚动
+                       pullUpLoad: this.pullup//配置下拉
+                     })
+                     this.scroll.on('scroll', (position) => {
+                       this.$emit('scrollPosition', position) //滚动的位置
+                     })
+                     this.scroll.on('scrollEnd', (position) => {
+                       this.$emit('scrollEnd', position) //滚动的位置，滑动停了
+                     })
+                     if (this.pullup) {
+                       this.scroll.on('pullingUp', () => {
+                         this.$emit('pullup')
+                       })
+                     }
+                   })
+                 }, 200)
+               },
+               updated() {
+                 // this.scroll.refresh()
+               },
+               methods: {
+                 refresh() {
+                   this.scroll && this.scroll.refresh()
+                 }
+               }
+
+             }
+             </script>
+
+             <style scoped>
+             .wrapperScroll{
+               height: 500px;
+             }
+
+             </style>
